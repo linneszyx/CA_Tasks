@@ -1,0 +1,12 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.sf": true,
+    "**/.sfdx": true
+  },
+  "workbench.editor.scrollToSwitchTabs": true,
+  "workbench.editor.highlightModifiedTabs": true,
+  "editor.rename.enablePreview": false,
+  "workbench.editor.enablePreview": false
+}

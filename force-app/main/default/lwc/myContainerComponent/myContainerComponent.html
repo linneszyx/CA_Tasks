@@ -1,0 +1,20 @@
+<template>
+    <div class="container">
+        <lightning-card title="Opportunity Manager">
+            <c-my-nav-bar ontogglefilter={handleToggleFilter}></c-my-nav-bar>
+            <div class="slds-grid slds-nowrap slds-gutters">
+                <template if:true={showFilter}>
+                    <div class="slds-col slds-size_1-of-4 slds-large-size_1-of-5">
+                        <c-my-filter-component onfilterchange={handleFilterChange} oncancel={handleCancelFilter}>
+                        </c-my-filter-component>
+                    </div>
+                </template>
+                <div class="slds-col slds-grow">
+                    <c-my-opportunity-container filters={selectedFilters} filter-logic={filterLogic}
+                        filter-logic-expression={filterLogicExpression}>
+                    </c-my-opportunity-container>
+                </div>
+            </div>
+        </lightning-card>
+    </div>
+</template>

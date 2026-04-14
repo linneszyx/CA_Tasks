@@ -1,0 +1,240 @@
+.filter-option {
+    margin-bottom: 16px;
+}
+
+.filter-box {
+    border: 1px solid #d8dde6;
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    background-color: #ffffff;
+}
+
+.filter-box.open {
+    padding: 1rem;
+}
+
+.filter-box.collapsed {
+    padding: 0.5rem;
+}
+
+.filter-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.filter-control-item {
+    flex: 1 1 100%;
+    min-width: 200px;
+}
+
+.add-filter-box {
+    border: 1px dashed #1589ee;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    cursor: pointer;
+    background-color: #f4f9ff;
+    text-align: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.add-filter-box.collapsed {
+    background-color: #eef6ff;
+}
+
+.add-filter-box.open {
+    background-color: #f4f9ff;
+    border-style: solid;
+}
+
+.add-filter-box:hover {
+    background-color: #e8f3ff;
+    border-color: #0f75d9;
+}
+
+.add-filter-box.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f3f3f3;
+    border-color: #d8dde6;
+}
+
+.filter-summary {
+    border: 1px dashed #1589ee;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background-color: #eef6ff;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.filter-summary:hover {
+    background-color: #e8f3ff;
+}
+
+.filter-summary-count {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #1d4ed8;
+}
+
+.filter-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.filter-box-title {
+    font-weight: 700;
+}
+
+.filter-box-close {
+    border: none;
+    background: transparent;
+    color: #1f2937;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.add-filter-label {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.add-filter-help {
+    color: #606469;
+    font-size: 0.875rem;
+}
+
+.selected-filters-box {
+    border: 1px solid #d8dde6;
+    border-radius: 0.75rem;
+    background-color: #f8fbff;
+    padding: 0.75rem;
+}
+
+.selected-filter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e1e5eb;
+}
+
+.selected-filter-item:last-child {
+    border-bottom: none;
+}
+
+.filter-logic-action {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filter-logic-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.slds-box {
+    border-radius: 0.5rem;
+    background : #f9fafb;
+}
+.filter-card {
+    border: 1px solid #d8dde6;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.filter-index {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.delete-btn {
+    cursor: pointer;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+}
+
+.filter-col {
+    flex: 1;
+    min-width: 150px;
+}
+
+.filter-label {
+    font-size: 12px;
+    color: #5f5f5f;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.logic-section {
+    margin-top: 1.5rem;
+}
+
+.logic-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.apply-section {
+    margin-top: 1.5rem;
+}
+
+:host {
+    overflow: visible !important;
+    position: relative;
+}
+
+.filter-card {
+    position: relative;
+    overflow: visible !important;
+}
+
+.filter-row {
+    position: relative;
+    overflow: visible !important;
+}
+
+lightning-combobox {
+    position: relative;
+    z-index: 9999;
+}
+.filter-container {
+    position:relative;
+    z-index: 1000;
+    overflow:visible;
+}

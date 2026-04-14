@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Opportunities">
+        <div class="search-container">
+            <lightning-input type="search" label="Search Opportunities" value={searchTerm} onchange={handleSearchChange}
+                placeholder="Enter Opportunity Name or Stage Name...">
+            </lightning-input>
+        </div>
+
+        <template if:true={errorMessage}>
+            <div class="datatable-wrapper slds-align_absolute-center slds-p-around_medium">
+                <p class="slds-text-color_error slds-text-body_regular slds-text-align_center">{errorMessage}</p>
+            </div>
+        </template>
+        <template if:true={hasData}>
+            <div class="datatable-wrapper">
+                <c-my-custom-data-table key-field="Id" data={paginatedData} columns={opportunityColumns}
+                    hide-checkbox-column="true" onsave={handleSave} draft-values={draftValues}
+                    column-widths-mode="auto">
+                </c-my-custom-data-table>
+            </div>
+        </template>
+        <template if:false={hasData}>
+            <div class="datatable-wrapper slds-align_absolute-center slds-p-around_medium">
+                <p class="slds-text-body_regular slds-text-align_center">No opportunities available yet.</p>
+            </div>
+        </template>
+
+        <div class="pagination-container">
+            <lightning-button label="Previous" onclick={handlePrevious}
+                disabled={isPreviousDisabled}></lightning-button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <lightning-button label="Next" onclick={handleNext} disabled={isNextDisabled}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

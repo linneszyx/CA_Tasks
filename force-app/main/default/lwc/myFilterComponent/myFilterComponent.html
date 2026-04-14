@@ -1,0 +1,44 @@
+<template>
+    <div class="filter-container">
+        <div class="filter-drawer">
+            <div class="filter-section-title">Matching {filterLogicLabel} these filters</div>
+            <template for:each={filters} for:item="filter">
+                <div key={filter.id} class="filter-card">
+                    <lightning-combobox data-id={filter.id} value={filter.field} options={fieldOptions}
+                        placeholder="Field" onchange={handleFieldChange}>
+                    </lightning-combobox>
+                    <lightning-combobox data-id={filter.id} value={filter.operator} options={filter.operatorOptions}
+                        placeholder="Operator" onchange={handleOperatorChange}>
+                    </lightning-combobox>
+                    <template if:true={filter.isPicklist}>
+                        <lightning-combobox class="value" data-id={filter.id} value={filter.value}
+                            options={filter.picklistOptions} placeholder="Value" onchange={handleValueChange}>
+                        </lightning-combobox>
+                    </template>
+                    <template if:false={filter.isPicklist}>
+                        <lightning-input data-id={filter.id} value={filter.value} placeholder="Value"
+                            onchange={handleValueChange}>
+                        </lightning-input>
+                    </template>
+                    <lightning-button-icon icon-name="utility:delete" variant="bare" data-id={filter.id}
+                        onclick={handleRemoveFilter}>
+                    </lightning-button-icon>
+                </div>
+            </template>
+            <div class="slds-m-top_small">
+                <lightning-button label="+ Add Filter" onclick={handleAddFilter}></lightning-button>
+                <lightning-button label="Remove All" variant="neutral" onclick={handleRemoveAll}></lightning-button>
+            </div>
+            <div class="slds-m-top_medium">
+                <lightning-input label="Filter Logic" value={filterLogicExpression} placeholder="e.g. 1 AND 2"
+                    onchange={handleFilterLogicExpressionChange}>
+                </lightning-input>
+            </div>
+            <div class="slds-m-top_medium slds-grid slds-grid_align-end slds-gutters_small">
+                <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+                <lightning-button variant="brand" label="Apply Filters" onclick={handleApplyFilters}></lightning-button>
+            </div>
+        </div>
+    </div>
+
+</template>
