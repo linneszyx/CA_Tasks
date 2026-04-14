@@ -1,4 +1,3 @@
-/* Container styling */
 :host {
     display: flex;
     flex-direction: column;
@@ -44,7 +43,6 @@ lightning-datatable {
     border-top: 1px solid #e5e5e5;
 }
 
-/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     lightning-datatable {
         font-size: 0.875rem;
