@@ -29,23 +29,12 @@ trigger OpportunityTrigger on Opportunity (
     // if(!oppIds.isEmpty()) {
     //     OpportunityHandler.convertAmount(oppIds);
     // }
-    Set<Id> accountIds = new Set<Id>();
+   if(Trigger.isAfter) {
     if(Trigger.isInsert || Trigger.isUpdate || Trigger.isUndelete) {
-        for(Opportunity opp : Trigger.new) {
-            if(opp.AccountId!=null) {
-                accountIds.add(opp.AccountId);
-            }
-        }
+        OppServiceAPI.updateAccountAmount(Trigger.new);
     }
-    if(Trigger.isUpdate || Trigger.isDelete) {
-        for(Opportunity opp : Trigger.old) {
-            if(opp.AccountId!=null) 
-            {
-                accountIds.add(opp.AccountId);
-            }
-        }
+    if(Trigger.isDelete) {
+        OppServiceAPI.updateAccountAmount(Trigger.old);
     }
-    if(!accountIds.isEmpty()) {
-        OppServiceAPI.updateAccountOpp(new List<Id>(accountIds));
-    }
+   }
 }
