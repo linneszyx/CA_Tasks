@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Matrix Records">
+        <lightning-record-edit-form>
+            <template lwc:if={hasRecords}>
+                <div class="slds-m-around_medium">
+                    <template for:each={records} for:item="rec">
+                        <div key={rec.id}>
+                            <p><strong>Relation Matrix:</strong> {rec.fields.Name.value}</p>
+                            <p><strong>Account Name:</strong> {rec.fields.Account__r.displayValue}</p>
+                            <p><strong>Contact Name:</strong> {rec.fields.Contact__r.displayValue}</p>
+                            <p><strong>User Name:</strong> {rec.fields.User__r.displayValue}</p>
+                            <p><strong>Health Value:</strong> {rec.fields.Health__c.value}</p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </lightning-record-edit-form>
+    </lightning-card>
+</template>

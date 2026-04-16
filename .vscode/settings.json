@@ -8,5 +8,6 @@
   "workbench.editor.scrollToSwitchTabs": true,
   "workbench.editor.highlightModifiedTabs": true,
   "editor.rename.enablePreview": false,
-  "workbench.editor.enablePreview": false
+  "workbench.editor.enablePreview": false,
+  "xml.preferences.showSchemaDocumentationType": "none"
 }
