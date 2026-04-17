@@ -1,8 +1,8 @@
 <template>
     <lightning-card>
-            <template lwc:if={recordPresent}>
-                <div class="data-wrap">
-                    <table class="slds-table slds-table_cell-buffer slds-table-bordered">
+        <template lwc:if={recordPresent}>
+            <div class="data-wrap">
+                <table class="slds-table slds-table_cell-buffer slds-table-bordered">
                         <thead>
                             <tr>
                                 <th scope="col">Contact</th>
@@ -38,8 +38,8 @@
                                         </template>
                                     </td>
                                 </template>
-                            </tr>
-                            </template>
+                        </tr>
+                        </template>
                     </tbody>
                 </table>
             </div>
@@ -54,17 +54,7 @@
         class = "slds-modal slds-fade-in-open">
         <div class="slds-modal__container">
             <header class="slds-modal__header">
-                <lightning-button
-                class="slds-button slds-button_icon slds-modal__close" 
-                title="Close" 
-                onclick={closeModal}>
-                <lightning-icon 
-                icon-name="utility:close"
-                alternative-text="Close" 
-                size="small">
-                </lightning-icon>
-                </lightning-button>
-                    <h2 id="model-heading" class="slds-modal__title slds-hyphenate">
+                    <h2 id="modal-heading" class="slds-modal__title slds-hyphenate">
                         Edit Relation Matrix
                     </h2>
             </header>
