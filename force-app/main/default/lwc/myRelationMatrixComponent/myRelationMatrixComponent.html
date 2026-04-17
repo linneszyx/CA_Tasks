@@ -1,19 +1,96 @@
 <template>
-    <lightning-card title="Matrix Records">
-        <lightning-record-edit-form>
-            <template lwc:if={hasRecords}>
-                <div class="slds-m-around_medium">
-                    <template for:each={records} for:item="rec">
-                        <div key={rec.id}>
-                            <p><strong>Relation Matrix:</strong> {rec.fields.Name.value}</p>
-                            <p><strong>Account Name:</strong> {rec.fields.Account__r.displayValue}</p>
-                            <p><strong>Contact Name:</strong> {rec.fields.Contact__r.displayValue}</p>
-                            <p><strong>User Name:</strong> {rec.fields.User__r.displayValue}</p>
-                            <p><strong>Health Value:</strong> {rec.fields.Health__c.value}</p>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </lightning-record-edit-form>
+    <lightning-card>
+            <template lwc:if={recordPresent}>
+                <div class="data-wrap">
+                    <table class="slds-table slds-table_cell-buffer slds-table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Contact</th>
+                                <template for:each={users}
+                                for:item ="user">
+                            <th key={user.id} scope="col">
+                                {user.name}
+                            </th></template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={rows}
+                            for:item="row">
+                        <tr key={row.id}>
+                            <th scope="row">{row.contactName}</th>
+                                <template for:each={row.cells} for:item="rc">
+                                    <td key={rc.key}>
+                                        <template lwc:if={rc.imgURL}>
+                                            <button 
+                                            type="button"
+                                            class="img-btn"
+                                            data-record-id={rc.relationId}
+                                            title={rc.health_value}
+                                            onclick={handleClick}
+                                            >
+                                            <img src={rc.imgURL}
+                                             alt={rc.health_value}
+                                             class="img-handle" />
+                                            </button>
+                                        </template>
+                                        <template lwc:else>
+                                            -
+                                        </template>
+                                    </td>
+                                </template>
+                            </tr>
+                            </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
     </lightning-card>
+    <template lwc:if={showModal} >
+        <section 
+        role="dialog" 
+        tabindex="-1" 
+        aria-modal="true"
+        aria-labelledby="modal-heading"
+        class = "slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning-button
+                class="slds-button slds-button_icon slds-modal__close" 
+                title="Close" 
+                onclick={closeModal}>
+                <lightning-icon 
+                icon-name="utility:close"
+                alternative-text="Close" 
+                size="small">
+                </lightning-icon>
+                </lightning-button>
+                    <h2 id="model-heading" class="slds-modal__title slds-hyphenate">
+                        Edit Relation Matrix
+                    </h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <lightning-record-edit-form
+                  object-api-name="Relation_Matrix__c"
+                  record-id={selectedRecordId}
+                  onsuccess = {handleSave}
+                >
+                  <lightning-input-field field-name="Name"></lightning-input-field>
+                  <lightning-input-field field-name="Health__c"></lightning-input-field>
+                  <lightning-input-field field-name="Account__c"></lightning-input-field>
+                  <lightning-input-field field-name="Contact__c"></lightning-input-field>
+                  <lightning-input-field field-name="User__c"></lightning-input-field>
+                  <div class="slds-m-top_medium">
+                    <lightning-button label="Cancel" onclick={closeModal}>
+                       </lightning-button>
+                        <lightning-button 
+                        type="submit"
+                        label="Save"
+                        class="slds-m-left_small">
+                    </lightning-button>
+                  </div>
+                </lightning-record-edit-form>
+            </div>
+        </div>
+    </section>
+    </template>
 </template>

@@ -1,0 +1,16 @@
+.img-handle {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.data-wrap {
+    overflow-x: auto;
+}
+
+.img-btn {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+}
