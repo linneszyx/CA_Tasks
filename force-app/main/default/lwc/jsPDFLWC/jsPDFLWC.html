@@ -1,0 +1,48 @@
+<template>
+    <lightning-quick-action-panel header="Account Report">
+        <div class="slds-p-around_medium">
+            <div class="slds-m-bottom_medium">
+                <h3 class="slds-m-bottom_small slds-text-heading_small">
+                    <strong>Account</strong>
+                </h3>
+                <p><strong>Account Name: </strong>{accountName}</p>
+                <p><strong>Phone: </strong>{phone}</p>
+                <p><strong>Rating: </strong>{rating}</p>
+                <p><strong>Industry: </strong>{industry}</p>
+            </div>
+
+            <div class="slds-m-bottom_medium">
+                <h3 class="slds-m-bottom_small slds-text-heading_small">
+                    <strong>Contacts</strong>
+                </h3>
+                <template if:true={hasContacts}>
+                    <lightning-datatable key-field="id" data={contactRecords} columns={contactColumns}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </template>
+                <template if:false={hasContacts}>
+                    <p>No contacts found.</p>
+                </template>
+            </div>
+
+            <div class="slds-m-bottom_medium">
+                <h3 class="slds-m-bottom_small slds-text-heading_small">
+                    <strong>Opportunities</strong>
+                </h3>
+                <template if:true={hasOpportunities}>
+                    <lightning-datatable key-field="id" data={opportunityRecords} columns={opportunityColumns}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </template>
+                <template if:false={hasOpportunities}>
+                    <p>No opportunities found.</p>
+                </template>
+            </div>
+        </div>
+
+        <div>
+            <lightning-button variant="brand" label="Download PDF" onclick={handlePDF}>
+            </lightning-button>
+        </div>
+    </lightning-quick-action-panel>
+</template>
