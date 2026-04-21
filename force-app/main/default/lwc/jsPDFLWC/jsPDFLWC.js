@@ -8,6 +8,8 @@ import NAME_FIELD from '@salesforce/schema/Account.Name';
 import PHONE_FIELD from '@salesforce/schema/Account.Phone';
 import RATING_FIELD from '@salesforce/schema/Account.Rating';
 import INDUSTRY_FIELD from '@salesforce/schema/Account.Industry';
+import USER_ID from '@salesforce/user/Id';
+import USER_NAME from '@salesforce/schema/User.Name';
 
 const fields = [NAME_FIELD, PHONE_FIELD, RATING_FIELD, INDUSTRY_FIELD];
 
@@ -31,10 +33,12 @@ export default class JsPDFLWC extends LightningElement {
     phone = '';
     rating = '';
     industry = '';
+    userName = '';
     jsPDFInitialized = false;
     contactRecords = [];
     opportunityRecords = [];
     error;
+
     connectedCallback() {
         loadScript(this, jsPDFs)
             .then(() => {
@@ -67,6 +71,16 @@ export default class JsPDFLWC extends LightningElement {
             'Contact.Phone'
         ]
     })
+
+    @wire(getRecord, { recordId: USER_ID, fields: [USER_NAME] })
+    userData({ data, error }) {
+        if (data) {
+            this.userName = getFieldValue(data, USER_NAME);
+        }
+        else if (error) {
+            console.log(error);
+        }
+    }
 
     retrievedContacts({ error, data }) {
         if (data) {
@@ -131,7 +145,7 @@ export default class JsPDFLWC extends LightningElement {
     totalWidth = 170;
 
     handlePDF() {
-        if (!this.jsPDFInitialized) {
+        if (!this.jsPDFInitialized || !window.jspdf) {
             console.log('jsPDF library not initialized');
             return;
         }
@@ -139,118 +153,227 @@ export default class JsPDFLWC extends LightningElement {
         const docu = new jsPDF();
         docu.setFillColor(240, 240, 240);
         docu.rect(0, 0, 210, 40, 'F');
+        docu.setFontSize(9);
         if (CloudAnalogy) {
             const img = new Image();
             img.src = CloudAnalogy;
-            docu.addImage(img, 'JPEG', 20, 20, 35, 20);
+            const imgHeight = 20;
+            const headHeight = 40;
+            const imgY = (headHeight - imgHeight) / 2;
+            docu.addImage(img, 'JPEG', 10, imgY, 35, imgHeight);
         }
         this.generatePDF(docu);
         docu.save('Account_Report.pdf');
     }
 
-    drawSection(docu, title, yPos) {
+    drawFormGrid(docu, { x, y, colWidths, rows }) {
+        let cy = y;
+        const padding = 2;
+        rows.forEach(r => {
+            let cx = x;
+            const cellHeights = r.map((c, i) => {
+                const txt = docu.splitTextToSize(
+                    String(c || ''),
+                    colWidths[i] - 4
+                );
+                return txt.length * 4 + 2;
+            });
+            const maxHeight = Math.max(...cellHeights);
+            r.forEach((c, i) => {
+                const txt = docu.splitTextToSize(String(c || ''), colWidths[i] - 4);
+                docu.setFontSize(9);
+                docu.setTextColor(0, 0, 0);
+                if (i % 2 !== 0) {
+                    docu.setFillColor(240, 240, 240);
+                    docu.rect(cx, cy, colWidths[i], maxHeight, 'F');
+                }
+                docu.setDrawColor(160);
+                docu.setLineWidth(0.2);
+                docu.rect(cx, cy, colWidths[i], maxHeight);
+                docu.text(txt, cx + padding, cy + 5, {
+                    maxWidth: colWidths[i] - 4
+                });
+                cx += colWidths[i];
+            })
+            cy += maxHeight;
+        })
+        return cy;
+    }
+
+    drawSection(docu, title, yPos, startX, tableWidth) {
+        const height = 8;
         docu.setFillColor(30, 64, 175);
-        docu.rect(20, yPos, 170, 12, 'F');
+        docu.rect(startX, yPos, tableWidth, height, 'F');
         docu.setTextColor(255, 255, 255);
-        docu.setFontSize(12);
-        docu.text(title, 25, yPos + 8);
-        return yPos + 18;
+        docu.setFontSize(9);
+        docu.text(title, startX + tableWidth / 2, yPos + 5.5, {
+            align: 'center'
+        })
+        docu.setTextColor(0, 0, 0);
+        return yPos + height + 6;
+    }
+
+    drawSingleRecordSection(docu, title, datarow, yPos, startX, tableWidth) {
+        yPos = this.drawSection(docu, title, yPos, startX, tableWidth);
+        const colWidths = [40, 50, 40, 50];
+        const startY = yPos;
+        yPos = this.drawFormGrid(docu, {
+            x: startX,
+            y: yPos,
+            colWidths,
+            rows: datarow
+        })
+        const height = yPos - startY;
+        docu.setDrawColor(120);
+        docu.setLineWidth(0.5);
+        docu.rect(startX, startY, tableWidth, height);
+        return yPos + 10;
+    }
+
+    getProjectDetailHeader() {
+        return [
+            [
+                'Project Name', this.accountName,
+                'Date of Report', this.formatDate(new Date())
+            ],
+            [
+                'Site Visit Date',
+                this.formatDate(new Date()),
+                'Case Visited By',
+                this.userName
+            ]
+        ]
+    }
+    formatDate(date) {
+        return new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        }).format(date);
     }
 
     generatePDF(docu) {
-        docu.setFontSize(18);
-        docu.text('Account Details', 200, 30, { align: 'right' });
+        docu.setFontSize(9);
         docu.setDrawColor(200);
         docu.line(10, 45, 200, 45);
-        docu.setFontSize(14);
+        docu.setFontSize(9);
         let yPos = 60;
-        const accountRow = [
-            ['AccountName', this.accountName],
-            ['Phone', this.phone],
-            ['Rating', this.rating],
-            ['Industry', this.industry]
-        ]
+        docu.setFontSize(9);
+        const colWidths = [40, 50, 40, 50];
+        const tableWidth = colWidths.reduce((a, b) => a + b, 0);
+        const pageWidth = docu.internal.pageSize.getWidth();
+        const startX = (pageWidth - tableWidth) / 2;
+        const startY = yPos;
+        yPos = this.drawFormGrid(docu, {
+            x: startX,
+            y: yPos,
+            colWidths,
+            rows: this.getProjectDetailHeader()
+        })
+        const tableHeight = yPos - startY;
+        docu.setDrawColor(120);
+        docu.setLineWidth(0.6);
+        docu.rect(startX, startY, tableWidth, tableHeight);
+        yPos += 12;
+        const accFields = [
+            { label: 'Account Name', value: this.accountName },
+            { label: 'Phone', value: this.phone },
+            { label: 'Rating', value: this.rating },
+            { label: 'Industry', value: this.industry }
+        ];
+        const accRows = this.buildTwoCol(accFields);
+        docu.setFontSize(9);
+        yPos = this.drawSection(docu, 'ACCOUNT Details', yPos, startX, tableWidth);
+        const accStartY = yPos;
+        docu.setFontSize(9);
+        yPos = this.drawFormGrid(docu, {
+            x: startX,
+            y: yPos,
+            colWidths: [40, 50, 40, 50],
+            rows: accRows
+        })
+        const accHeight = yPos - accStartY;
+        docu.setLineWidth(0.6);
+        docu.rect(startX, accStartY, tableWidth, accHeight);
+        yPos += 10;
+        if (yPos > 250) {
+            docu.addPage();
+            yPos = 20;
+        }
+        docu.setFontSize(9);
+        yPos = this.drawSection(docu, 'CONTACTS', yPos, startX, tableWidth);
+        if (this.hasContacts) {
+            this.contactRecords.forEach((c, idx) => {
+                const fields = [
+                    { label: 'Name', value: c.name },
+                    { label: 'Email', value: c.email },
+                    { label: 'Phone', value: c.phone }
+                ];
+                const rows = this.buildTwoCol(fields)
+                yPos = this.drawSingleRecordSection(docu,
+                    `CONTACT ${idx + 1}`,
+                    rows,
+                    yPos,
+                    startX,
+                    tableWidth
+                )
+            })
+        }
+        else {
+            yPos = this.drawSingleRecordSection(
+                docu,
+                'CONTACT',
+                [['Info', 'No Contacts']],
+                yPos,
+                startX,
+                tableWidth
+            )
+        }
+        docu.setFontSize(9);
+        yPos += 10;
+        if (yPos > 250) {
+            docu.addPage();
+            yPos = 20;
+        }
+        docu.setFontSize(9);
+        yPos = this.drawSection(docu, 'OPPORTUNITIES', yPos, startX, tableWidth);
+        if (this.hasOpportunities) {
+            this.opportunityRecords.forEach((o, idx) => {
+                const fields = [
+                    { label: 'Name', value: o.name },
+                    { label: 'Stage', value: o.stageName },
+                    { label: 'Amount', value: o.amount },
+                    { label: 'Close Date', value: o.closeDate }
+                ];
+                const rows = this.buildTwoCol(fields);
+                yPos = this.drawSingleRecordSection(
+                    docu,
+                    `OPPORTUNITY ${idx + 1}`,
+                    rows,
+                    yPos,
+                    startX,
+                    tableWidth
+                )
+            })
+        }
+        else {
+            yPos = this.drawSingleRecordSection(
+                docu,
+                'OPPORTUNITY',
+                [['Info', 'No Opportunities']],
+                yPos,
+                startX,
+                tableWidth
+            )
+        }
 
-        yPos = this.drawSection(docu, 'ACCOUNT Details', yPos);
-        yPos = this.tableMake(docu, {
-            xPos: 20,
-            yPos,
-            headers: ['Field', 'Value'],
-            rows: accountRow,
-            columnWidths: [100, 80]
-        })
-        yPos += 10;
-        docu.setFontSize(14);
-        yPos = this.drawSection(docu, 'CONTACTS', yPos);
-        const contactHeader = ['Name', 'Email', 'Phone'];
-        const contactRow = this.hasContacts ? this.contactRecords.map(c => [c.name, c.email, c.phone]) : [['No Contact', '-', '-']]
-        const contactWidth = this.calculateColWidth(
-            docu,
-            contactHeader,
-            contactRow,
-            totalWidth
-        )
-        yPos = this.tableMake(docu, {
-            xPos: 20,
-            yPos,
-            headers: contactHeader,
-            rows: contactRow,
-            columnWidths: contactWidth
-        })
-        // if (this.hasContacts) {
-        //     let line = 100;
-        //     this.contactRecords.forEach((con, idx) => {
-        //         docu.text(`${idx + 1}. Name: ${con.name}`, 25, line);
-        //         line += 5;
-        //         docu.text(`Email: ${con.email}`, 25, line);
-        //         line += 5;
-        //         docu.text(`Phone: ${con.phone}`, 25, line);
-        //         line += 15;
-        //     });
-        // } else {
-        //     docu.text('No contacts found', 25, 100);
-        // }
-        docu.setFontSize(14);
-        yPos += 10;
-        yPos = this.drawSection(docu, 'OPPORTUNITIES', yPos);
-        const opportunityRow = this.hasOpportunities ? this.opportunityRecords.map(o => [o.name, o.stageName, o.amount, o.closeDate
-        ]) : [['No Opportunities', '-', '-', '-']]
-        const oppHeaders = ['Name', 'Stage', 'Amount', 'Close Date'];
-        const oppWidths = this.calculateColumnWidths(
-            docu,
-            oppHeaders,
-            oppRows,
-            totalWidth
-        );
-        this.tableMake(docu, {
-            xPos: 20,
-            yPos,
-            headers: oppHeaders,
-            rows: opportunityRow,
-            columnWidths: oppWidths
-        })
-        // if (this.hasOpportunities) {
-        //     let line = 190;
-        //     this.opportunityRecords.forEach((opp, idx) => {
-        //         docu.text(`${idx + 1}. Name: ${opp.name}`, 25, line);
-        //         line += 5;
-        //         docu.text(`Stage: ${opp.stageName}`, 25, line);
-        //         line += 5;
-        //         docu.text(`Amount: ${opp.amount}`, 25, line);
-        //         line += 5;
-        //         docu.text(`Close Date: ${opp.closeDate}`, 25, line);
-        //         line += 10;
-        //     });
-        // } else {
-        //     docu.text('No opportunities found', 25, 190);
-        // }
     }
     calculateColWidth(docu, headers, row, totalWidth) {
         const padding = 10;
         const maxWidth = headers.map((header, idx) => {
             let mx = docu.getTextWidth(header);
             row.forEach(r => {
-                const cell = String(row[idx] || '-');
+                const cell = String(r[idx] || '-');
                 const cellWidth = docu.getTextWidth(cell);
                 if (cellWidth > mx) {
                     mx = cellWidth;
@@ -261,10 +384,23 @@ export default class JsPDFLWC extends LightningElement {
         const totalConWidth = maxWidth.reduce((a, b) => a + b, 0);
         return maxWidth.map(w => (w / totalConWidth) * totalWidth);
     }
+
+    buildTwoCol(fields) {
+        const rows = [];
+        for (let i = 0; i < fields.length; i += 2) {
+            const l = fields[i];
+            const r = fields[i + 1];
+            rows.push([
+                l.label, l.value,
+                r ? r.label : '',
+                r ? r.value : ''
+            ])
+        }
+        return rows;
+    }
     tableMake(docu, { xPos, yPos, headers, rows, columnWidths }) {
         let y = yPos;
         const padding = 4;
-        const lineHeight = 5;
         const pageHeight = 297;
         docu.setFillColor(0, 102, 204);
         docu.setTextColor(255, 255, 255);
@@ -308,13 +444,10 @@ export default class JsPDFLWC extends LightningElement {
             }
             row.forEach((cell, i) => {
                 const text = docu.splitTextToSize(String(cell || '-'), columnWidths[i] - 8);
-
                 docu.rect(x, y, columnWidths[i], rowHeight);
                 docu.text(text, x + padding, y + 6);
-
                 x += columnWidths[i];
             });
-
             y += rowHeight;
         });
 
