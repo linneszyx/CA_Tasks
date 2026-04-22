@@ -1,6 +1,9 @@
 <template>
-    <div class="slds-p-around_medium">
-        <lightning-button variant="brand" label="Generate PDF" onclick={handleSave} disabled={isLoading}>
+    <div class="main-ctn">
+        <iframe src={visualForceUrl}></iframe>
+    </div>
+    <div class="btn">
+        <lightning-button variant="brand" label="Save" onclick={handleSave} disabled={isLoading}>
         </lightning-button>
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Generating PDF"></lightning-spinner>

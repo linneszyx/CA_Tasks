@@ -4,6 +4,9 @@ import generatePdf from '@salesforce/apex/PdfController.generatePdf';
 export default class PdfGenerationComponent extends LightningElement {
     @api recordId;
     isLoading = false;
+    get visualForceUrl() {
+        return '/apex/displayPDF?id=' + this.recordId;
+    }
     async handleSave() {
         this.isLoading = true;
         try {
