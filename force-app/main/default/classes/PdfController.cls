@@ -18,7 +18,7 @@ public class PdfController {
             cv.VersionData = pdfBlob;
             cv.FirstPublishLocationId = recordId; 
             insert cv;
-            return[ SELECT ContentDocumentId  FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+            return [ SELECT ContentDocumentId  FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
         } catch (Exception e) {
             throw new AuraHandledException('PDF generation failed: ' + e.getMessage());
         }
