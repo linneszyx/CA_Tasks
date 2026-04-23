@@ -1,8 +1,11 @@
 <template>
-    <lightning-card title="Case Grid">
+    <lightning-card title="Case Detail">
         <div class="slds-p-around_medium">
-            <lightning-tree-grid key-field="Id" data={gridData} columns={columns} expanded-rows={expandedRows}
-                ontoggle={handleToggling} hide-checkbox-column>
+            <lightning-tree-grid key-field="Id" 
+            data={gridData} 
+            columns={columns} 
+            expanded-rows={expandedRows}
+            ontoggle={handleToggling} hide-checkbox-column>
             </lightning-tree-grid>
         </div>
     </lightning-card>

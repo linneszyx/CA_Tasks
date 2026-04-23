@@ -5,8 +5,12 @@ import getRecordCases from '@salesforce/apex/CaseController.getRecordCases';
 const CASE_COL = [
     {
         label: 'Case Number',
-        fieldName: 'CaseNumber',
-        type: 'text'
+        fieldName: 'caseUrl',
+        type: 'url',
+        typeAttributes: {
+            label: { fieldName: 'CaseNumber' },
+            target: '_blank'
+        }
     },
     {
         label: 'Priority',
@@ -19,25 +23,18 @@ const CASE_COL = [
     {
         label: 'Status',
         fieldName: 'Status'
-    },
-    {
-        label: 'Parent Id',
-        fieldName: 'ParentId'
     }
 ]
 
 export default class ChildCaseComponent extends LightningElement {
-
     @api recordId
     @track expandRows = []
     columns = CASE_COL
     gridData = []
     error
-
     connectedCallback() {
         this.getData()
     }
-
     getData() {
         if (this.recordId) {
             getRecordCases({ recordId: this.recordId })
@@ -60,33 +57,37 @@ export default class ChildCaseComponent extends LightningElement {
     }
     changeData(rec) {
         let res = [];
-        for (let i = 0; i < rec.length; i++) {
-            let c = rec[i]
-            let row = {
-                Id: c.Id,
-                CaseNumber: c.CaseNumber,
-                Status: c.Status,
-                Priority: c.Priority,
-                ParentCaseNumber: null,
+        for (let i = 0; i < rec.length; i += 1) {
+            let one_case = rec[i]
+            res.push({
+                Id: one_case.Id,
+                ParentId: one_case.ParentId,
+                CaseNumber: one_case.CaseNumber,
+                Status: one_case.Status,
+                Priority: one_case.Priority,
+                Origin: one_case.Origin,
+                caseUrl: '/' + one_case.Id,
                 _children: []
-            }
-
-            if (c.Parent) {
-                row.ParentCaseNumber = c.Parent.CaseNumber;
-                if (c.ParentId) {
-                    row._children.push({
-                        Id: c.ParentId,
-                        CaseNumber: c.Parent.CaseNumber,
-                        Status: c.Parent.Status,
-                        Priority: c.Parent.Priority,
-                    })
+            })
+        }
+        for (let i = 0; i < res.length; i += 1) {
+            let child_case = res[i];
+            if (child_case.ParentId) {
+                for (let j = 0; j < res.length; j += 1) {
+                    if (res[j].Id === child_case.ParentId) {
+                        res[j]._children.push(child_case);
+                        break;
+                    }
                 }
             }
-
-            res.push(row)
         }
-
-        return res
+        let result = []
+        for (let i = 0; i < res.length; i += 1) {
+            if (!res[i].ParentId) {
+                result.push(res[i]);
+            }
+        }
+        return result;
     }
     handleToggling(event) {
         this.expandRows = event.detail.expandRows;
