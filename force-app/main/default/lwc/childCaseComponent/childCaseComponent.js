@@ -1,7 +1,6 @@
 import { LightningElement, track, api } from 'lwc';
 import getAllCases from '@salesforce/apex/CaseController.getAllCases';
 import getRecordCases from '@salesforce/apex/CaseController.getRecordCases';
-
 const CASE_COL = [
     {
         label: 'Case Number',
@@ -25,7 +24,6 @@ const CASE_COL = [
         fieldName: 'Status'
     }
 ]
-
 export default class ChildCaseComponent extends LightningElement {
     @api recordId
     @track expandRows = []
@@ -57,37 +55,27 @@ export default class ChildCaseComponent extends LightningElement {
     }
     changeData(rec) {
         let res = [];
+        let map = {}
         for (let i = 0; i < rec.length; i += 1) {
-            let one_case = rec[i]
-            res.push({
-                Id: one_case.Id,
-                ParentId: one_case.ParentId,
-                CaseNumber: one_case.CaseNumber,
-                Status: one_case.Status,
-                Priority: one_case.Priority,
-                Origin: one_case.Origin,
-                caseUrl: '/' + one_case.Id,
+            let parent_case = rec[i]
+            map[parent_case.Id] = {
+                Id: parent_case.Id,
+                ParentId: parent_case.ParentId,
+                CaseNumber: parent_case.CaseNumber,
+                Status: parent_case.Status,
+                Priority: parent_case.Priority,
+                Origin: parent_case.Origin,
+                caseUrl: '/' + parent_case.Id,
                 _children: []
-            })
-        }
-        for (let i = 0; i < res.length; i += 1) {
-            let child_case = res[i];
-            if (child_case.ParentId) {
-                for (let j = 0; j < res.length; j += 1) {
-                    if (res[j].Id === child_case.ParentId) {
-                        res[j]._children.push(child_case);
-                        break;
-                    }
-                }
             }
         }
-        let result = []
-        for (let i = 0; i < res.length; i += 1) {
-            if (!res[i].ParentId) {
-                result.push(res[i]);
-            }
+        for (let i = 0; i < rec.length; i += 1) {
+            let one_case = rec[i];
+            if (one_case.ParentId && map[one_case.ParentId])
+                map[one_case.ParentId]._children.push(map[one_case.Id]);
+            else res.push(map[one_case.Id]);
         }
-        return result;
+        return res;
     }
     handleToggling(event) {
         this.expandRows = event.detail.expandRows;
