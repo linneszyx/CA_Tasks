@@ -1,4 +1,5 @@
-    public with sharing class CaseController {
+    public with sharing class CaseController 
+    {
         @AuraEnabled(cacheable=true)
         public static List<Case> getAllCases(){
             try {

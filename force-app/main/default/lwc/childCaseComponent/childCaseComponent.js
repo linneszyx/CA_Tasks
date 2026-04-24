@@ -55,10 +55,10 @@ export default class ChildCaseComponent extends LightningElement {
     }
     changeData(rec) {
         let res = [];
-        let map = {}
+        let mp = {}
         for (let i = 0; i < rec.length; i += 1) {
             let parent_case = rec[i]
-            map[parent_case.Id] = {
+            mp[parent_case.Id] = {
                 Id: parent_case.Id,
                 ParentId: parent_case.ParentId,
                 CaseNumber: parent_case.CaseNumber,
@@ -71,9 +71,9 @@ export default class ChildCaseComponent extends LightningElement {
         }
         for (let i = 0; i < rec.length; i += 1) {
             let one_case = rec[i];
-            if (one_case.ParentId && map[one_case.ParentId])
-                map[one_case.ParentId]._children.push(map[one_case.Id]);
-            else res.push(map[one_case.Id]);
+            if (one_case.ParentId && mp[one_case.ParentId])
+                mp[one_case.ParentId]._children.push(mp[one_case.Id]);
+            else res.push(mp[one_case.Id]);
         }
         return res;
     }
