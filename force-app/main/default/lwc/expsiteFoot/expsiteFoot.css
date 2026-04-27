@@ -1,0 +1,17 @@
+.host {
+    background: cornflowerblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.host lightning-card {
+    width: 100%;
+}
+
+.host p {
+    text-align: center;
+    margin: 0;
+}

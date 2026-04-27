@@ -1,0 +1,8 @@
+<template>
+    <template for:each={products} for:item="prod">
+        <div key={prod.Id} class="card">
+            <p>{prod.Name}</p>
+            <p>{prod.Product2.Name}</p>
+        </div>
+    </template>
+</template>

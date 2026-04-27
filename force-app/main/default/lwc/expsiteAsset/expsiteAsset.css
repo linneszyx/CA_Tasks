@@ -1,0 +1,12 @@
+.centered-tabs {
+    display: flex;
+    justify-content: center;
+}
+
+lightning-tabset.centered-tabs {
+    --slds-c-tabs-list-item-spacing-inline-end: 30px;
+}
+
+lightning-card {
+    margin: 20px;
+}
