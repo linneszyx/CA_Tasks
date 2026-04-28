@@ -1,25 +1,70 @@
 <template>
     <lightning-card>
         <div class="tab-container">
-            <lightning-tabset class="lightning-tabset">
+            <lightning-tabset class="lightning-tabset" variant="scoped">
                 <lightning-tab label="Products">
-                    <c-expsite-product type="product" oncreatecase={handleCreateCase}>
-                    </c-expsite-product>
+                    <div class="tab-panel">
+                        <c-expsite-product type="product" onextend={handleExtendWarranty}
+                            oncreatecase={handleCreateCase}>
+                        </c-expsite-product>
+                    </div>
                 </lightning-tab>
                 <lightning-tab label="Services">
-                    <c-expsite-product type="service" oncreatecase={handleCreateCase}>
-                    </c-expsite-product>
+                    <div class="tab-panel">
+                        <c-expsite-product type="service" oncreatecase={handleCreateCase}>
+                        </c-expsite-product>
+                    </div>
                 </lightning-tab>
             </lightning-tabset>
         </div>
-        <template if:true={showModal}>
-            <c-case-form asset-id={selectedAssetId} onsuccess={handleSuccess} onclose={closeModal}>
-            </c-case-form>
+        <template if:true={showExtendModal}>
+            <c-extend-warranty-modal 
+            asset-id={selectedAssetId} 
+            onclose={closeExtendModal} 
+            onsuccess={handleSuccess}>
+            </c-extend-warranty-modal>
         </template>
-
+        <template if:true={showCaseModal}>
+            <div class="modal-wrapper slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium">Create Case</h2>
+                    </header>
+                    <section class="slds-modal__content">
+                        <c-case-form asset-id={selectedAssetId} onsuccess={handleCaseSuccess} onclose={closeCaseModal}>
+                        </c-case-form>
+                    </section>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="neutral" label="Close" onclick={closeCaseModal}></lightning-button>
+                    </footer>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        <template if:true={showExtendModal}>
+            <div class="modal-wrapper slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 class="slds-text-heading_medium">Extend Warranty</h2>
+                    </header>
+                    <section class="slds-modal__content">
+                        <p>Extend warranty for asset Id: {selectedAssetId}</p>
+                    </section>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="brand" label="Confirm"
+                            onclick={handleConfirmExtend}></lightning-button>
+                        <lightning-button variant="neutral" label="Cancel"
+                            onclick={closeExtendModal}></lightning-button>
+                    </footer>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
         <template if:true={showSuccess}>
-            <c-success-modal case-number={caseNumber} onredirect={goToCases}>
-            </c-success-modal>
+            <div class="success-wrapper">
+                <c-success-modal case-number={caseNumber} onredirect={goToCases}>
+                </c-success-modal>
+            </div>
         </template>
     </lightning-card>
 </template>

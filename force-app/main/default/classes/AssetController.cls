@@ -6,7 +6,7 @@ public without sharing class AssetController
         Id userId = UserInfo.getUserId();
         User u = [SELECT ContactId, AccountId FROM User WHERE Id = :userId LIMIT 1];
         List<Asset> assetList =  [
-            SELECT Id, Name, Status, Product2.Name
+            SELECT Id, Name, Status, Product2.Name,Warranty_Status__c
             FROM Asset  WHERE AccountId = :u.AccountId
         ];
         return assetList;
@@ -70,7 +70,18 @@ public without sharing class AssetController
             throw new AuraHandledException('ERROR: ' + e.getMessage());
         }
     }
-
+     @AuraEnabled 
+        public static Asset extendWarranty(Id assetId,Integer months) {
+         Asset a = [SELECT Id,Warranty_End__c FROM Asset WHERE Id=:assetId LIMIT 1];
+          if (a.Warranty_End__c == null) {
+            a.Warranty_End__c = System.today().addMonths(months);
+        } 
+        else {
+        a.Warranty_End__c = a.Warranty_End__c.addMonths(months);
+     }
+        update a;
+        return a;
+    }
     public class AssetRep {
         @AuraEnabled public List<Asset> al;
         @AuraEnabled public Map<String, Id> rtMap;

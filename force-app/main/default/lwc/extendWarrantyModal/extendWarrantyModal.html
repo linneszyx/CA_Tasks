@@ -1,0 +1,12 @@
+<template>
+    <section class="modal">
+        <lightning-card title="Extend Warranty">
+            <lightning-input label="Extension (Months)" type="number" value={months} onchange={handleChange}>
+            </lightning-input>
+            <lightning-button label="Extend" variant="brand" onclick={extend}>
+            </lightning-button>
+            <lightning-button label="Cancel" onclick={close}>
+            </lightning-button>
+        </lightning-card>
+    </section>
+</template>

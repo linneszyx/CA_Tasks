@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title="Topics">
+
+        <template if:true={articles}>
+            <template for:each={articles} for:item="art">
+                <div key={art.Id} class="slds-box slds-m-bottom_small">
+
+                    <p class="slds-text-heading_small">
+                        {art.Title}
+                    </p>
+
+                    <p>{art.Summary}</p>
+
+                </div>
+            </template>
+        </template>
+
+        <template if:false={articles}>
+            <p>No Articles Found</p>
+        </template>
+
+    </lightning-card>
+</template>
