@@ -1,6 +1,6 @@
 .header-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 10px 20px;
     width: 100%;
@@ -20,11 +20,9 @@
 
 .nav-center {
     display: flex;
-    gap: 40px;
+    gap: 24px;
     align-items: center;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-left: 16px;
 }
 
 .nav-item {

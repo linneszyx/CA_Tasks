@@ -1,11 +1,26 @@
 <template>
     <lightning-card title="My Assets">
-        <lightning-tabset class="centered-tabs">
-            <lightning-tab label="Products">
-                <c-expsite-product oncreatecase={handleCreateCase}></c-expsite-product>
-            </lightning-tab>
-            <lightning-tab label="Services">
-            </lightning-tab>
-        </lightning-tabset>
+        <div class="tab-container">
+            <lightning-tabset class="lightning-tabset">
+                <lightning-tab label="Products">
+                    <c-expsite-product type="product" oncreatecase={handleCreateCase}>
+                    </c-expsite-product>
+                </lightning-tab>
+                <lightning-tab label="Services">
+                    <c-expsite-product type="service" oncreatecase={handleCreateCase}>
+                    </c-expsite-product>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+        <template if:true={showModal}>
+            <c-case-form asset-id={selectedAssetId} onsuccess={handleSuccess} onclose={closeModal}>
+            </c-case-form>
+        </template>
+
+        <template if:true={showSuccess}>
+            <c-success-modal case-number={caseNumber} onredirect={goToCases}>
+            </c-success-modal>
+        </template>
+
     </lightning-card>
 </template>

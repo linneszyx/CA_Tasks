@@ -1,0 +1,10 @@
+<template>
+    <section class="modal">
+        <lightning-card title="Create Case">
+            <lightning-input label="Subject" onchange={handleSubject}></lightning-input>
+            <lightning-textarea label="Description" onchange={handleDesc}></lightning-textarea>
+            <lightning-button label="Submit" onclick={submit}></lightning-button>
+            <lightning-button label="Cancel" onclick={close}></lightning-button>
+        </lightning-card>
+    </section>
+</template>

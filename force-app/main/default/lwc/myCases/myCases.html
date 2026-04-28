@@ -1,0 +1,14 @@
+<template>
+    <lightning-card title="My Cases">
+        <template if:true={cases}>
+            <template for:each={cases} for:item="c">
+                <div key={c.Id} class="slds-box slds-m-bottom_small">
+                    <p>Case #: {c.CaseNumber}</p>
+                    <p>{c.Subject}</p>
+                    <p>Status: {c.Status}</p>
+                </div>
+            </template>
+        </template>
+
+    </lightning-card>
+</template>

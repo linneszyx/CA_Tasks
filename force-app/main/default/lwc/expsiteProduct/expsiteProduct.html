@@ -1,8 +1,14 @@
 <template>
-    <template for:each={products} for:item="prod">
-        <div key={prod.Id} class="card">
-            <p>{prod.Name}</p>
-            <p>{prod.Product2.Name}</p>
-        </div>
+    <template if:true={hasData}>
+        <template for:each={finalData} for:item="rec">
+            <div key={rec.Id} class="slds-box slds-m-bottom_small">
+                <p><b>{rec.Name}</b></p>
+                <p>Status : {rec.Status}</p>
+                <lightning-button label='Create Case' data-id={rec.Id} onclick={createCase}></lightning-button>
+            </div>
+        </template>
+    </template>
+    <template if:false={hasData}>
+        <p>No Data</p>
     </template>
 </template>

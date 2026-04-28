@@ -1,12 +1,25 @@
-.centered-tabs {
+.tab-container {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* centers the tabset horizontally */
 }
 
-lightning-tabset.centered-tabs {
-    --slds-c-tabs-list-item-spacing-inline-end: 30px;
+/* Add spacing between the tab labels.
+   lightning-tabset renders its tabs in a slot; target slotted tab elements.
+   The selector below increases the gap between tabs while keeping the default SLDS styles. */
+.lightning-tabset ::slotted(lightning-tab) {
+    margin: 0 0.5rem; /* horizontal spacing between tabs */
 }
 
-lightning-card {
-    margin: 20px;
+/* Small visual tweak: increase clickable area of tab labels for better UX */
+.lightning-tabset ::slotted(lightning-tab) .slds-tabs_default__link,
+.lightning-tabset ::slotted(lightning-tab) .slds-tabs_scoped__link {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+/* Responsive: ensure centering remains on narrow screens */
+@media (max-width: 480px) {
+    .lightning-tabset ::slotted(lightning-tab) {
+        margin: 0 0.25rem;
+    }
 }

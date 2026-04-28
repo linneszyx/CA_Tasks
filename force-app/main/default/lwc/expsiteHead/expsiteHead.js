@@ -1,27 +1,26 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import CloudAnalogy from '@salesforce/resourceUrl/CloudAnalogy';
-
 export default class ExpsiteHead extends NavigationMixin(LightningElement) {
     cloudAnalogyLogo = CloudAnalogy;
-    navigatePage(url_dest) {
+    navigatePage(pgName) {
         this[NavigationMixin.Navigate]({
-            type: 'standard__webPage',
+            type: 'comm__namedPage',
             attributes: {
-                url: url_dest
+                name: pgName
             }
         })
     }
     myHome() {
-        this.navigatePage('/')
+        this.navigatePage('Home')
     }
     myAsset() {
-        this.navigatePage('/my-asset');
+        this.navigatePage('myasset__c');
     }
     myCases() {
-        this.navigatePage('/my-cases');
+        this.navigatePage('My_Cases__c');
     }
     myTopics() {
-        this.navigatePage('/my-topics');
+        this.navigatePage('My_Topics__c');
     }
 }
