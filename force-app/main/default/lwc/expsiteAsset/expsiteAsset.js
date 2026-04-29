@@ -71,4 +71,11 @@ export default class ExpsiteAsset extends LightningElement {
         this.closeExtendModal();
         this.dispatchEvent(new CustomEvent('warrantyextended', { detail: this.selectedAssetId }));
     }
+    handleSuccess() {
+    this.closeExtendModal();
+    const child = this.template.querySelector('c-expsite-product');
+    if (child) {
+        child.currentPage = 1; 
+    }
+}
 }

@@ -16,9 +16,9 @@ export default class CaseForm extends LightningElement {
             subject: this.subject,
             description: this.description
         })
-            .then(r => {
+            .then(res => {
                 this.dispatchEvent(new CustomEvent('success', {
-                    detail: r.CaseNumber
+                    detail: res.CaseNumber
                 }));
             });
     }

@@ -4,9 +4,11 @@
             <lightning-tabset class="lightning-tabset" variant="scoped">
                 <lightning-tab label="Products">
                     <div class="tab-panel">
-                        <c-expsite-product type="product" onextend={handleExtendWarranty}
-                            oncreatecase={handleCreateCase}>
-                        </c-expsite-product>
+                       <c-expsite-product
+    type="product"
+    onopenextendmodal={handleOpenExtendModal}
+    oncreatecase={handleCreateCase}>
+</c-expsite-product>
                     </div>
                 </lightning-tab>
                 <lightning-tab label="Services">
@@ -17,13 +19,13 @@
                 </lightning-tab>
             </lightning-tabset>
         </div>
-        <template if:true={showExtendModal}>
-            <c-extend-warranty-modal 
-            asset-id={selectedAssetId} 
-            onclose={closeExtendModal} 
-            onsuccess={handleSuccess}>
-            </c-extend-warranty-modal>
-        </template>
+       <template if:true={showExtendModal}>
+    <c-extend-warranty-modal 
+        asset-id={selectedAssetId} 
+        onclose={closeExtendModal} 
+        onsuccess={handleSuccess}>
+    </c-extend-warranty-modal>
+</template>
         <template if:true={showCaseModal}>
             <div class="modal-wrapper slds-modal slds-fade-in-open">
                 <div class="slds-modal__container">
@@ -41,25 +43,7 @@
             </div>
             <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
-        <template if:true={showExtendModal}>
-            <div class="modal-wrapper slds-modal slds-fade-in-open">
-                <div class="slds-modal__container">
-                    <header class="slds-modal__header">
-                        <h2 class="slds-text-heading_medium">Extend Warranty</h2>
-                    </header>
-                    <section class="slds-modal__content">
-                        <p>Extend warranty for asset Id: {selectedAssetId}</p>
-                    </section>
-                    <footer class="slds-modal__footer">
-                        <lightning-button variant="brand" label="Confirm"
-                            onclick={handleConfirmExtend}></lightning-button>
-                        <lightning-button variant="neutral" label="Cancel"
-                            onclick={closeExtendModal}></lightning-button>
-                    </footer>
-                </div>
-            </div>
-            <div class="slds-backdrop slds-backdrop_open"></div>
-        </template>
+      
         <template if:true={showSuccess}>
             <div class="success-wrapper">
                 <c-success-modal case-number={caseNumber} onredirect={goToCases}>
