@@ -1,9 +1,59 @@
 <template>
     <template if:true={hasData}>
-        <lightning-datatable key-field="Id" data={pagedData} columns={columns} onrowaction={handleRowAction}
-            hide-checkbox-column>
-        </lightning-datatable>
-        <div class="pagination slds-grid slds-grid_align-center slds-m-top_medium">
+        <div class="slds-table_edit_container slds-m-bottom_medium">
+            <table class="slds-table
+            slds-table_cell-buffer 
+            slds-table_bordered 
+            slds-table_striped" role="grid">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <template for:each={columns} for:item="col">
+                            <th scope="col" key={col.fieldName}>
+                                <div class="slds-truncate" title={col.label}>{col.label}</div>
+                            </th>
+                        </template>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Actions">Feature</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={processedRows} for:item="prow">
+                        <tr key={prow._rowKey}>
+                            <template for:each={prow._cells} for:item="c">
+                                <td key={c.key} data-label={c.key}>
+                                    <div class="slds-truncate" title={c.value}>
+                                        {c.value}
+                                    </div>
+                                </td>
+                            </template>
+                            <td>
+                                <template if:true={prow._isWarrantyActive}>
+                                    <lightning-button variant="brand" label="Open Case" data-id={prow.original.Id}
+                                        onclick={handleOpenCaseClick}></lightning-button>
+                                </template>
+                                <template if:false={prow._isWarrantyActive}>
+                                    <lightning-button variant="neutral" label="Extend Warranty"
+                                        data-id={prow.original.Id} onclick={handleExtendClick}></lightning-button>
+                                </template>
+                                <template if:false={prow._hasWarrantyStatus}>
+                                    <lightning-button variant="brand" label="Open Case" data-id={prow.original.Id}
+                                        onclick={handleOpenCaseClick}></lightning-button>
+                                    <lightning-button variant="neutral" label="Extend Warranty"
+                                        data-id={prow.original.Id} onclick={handleExtendClick}
+                                        class="slds-m-left_small"></lightning-button>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination 
+        slds-grid 
+        slds-grid_align-center 
+        slds-m-top_medium">
             <div class="slds-col">
                 <lightning-button variant="neutral" label="Previous" onclick={handlePrev}
                     disabled={isFirstPage}></lightning-button>

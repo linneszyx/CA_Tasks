@@ -9,5 +9,6 @@
   "workbench.editor.highlightModifiedTabs": true,
   "editor.rename.enablePreview": false,
   "workbench.editor.enablePreview": false,
-  "xml.preferences.showSchemaDocumentationType": "none"
+  "xml.preferences.showSchemaDocumentationType": "none",
+  "salesforcedx-vscode-core.show-cli-success-msg": false
 }

@@ -23,7 +23,7 @@ public without sharing class AssetController
                 Origin = 'Web'
             );
             insert c;
-            return c;
+            return c;   
 
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
@@ -31,28 +31,36 @@ public without sharing class AssetController
     }
     @AuraEnabled(cacheable=true)
     public static List<Case> getAllCases() {
-        User u = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
-        List<Case> caseList =  [ SELECT Id, CaseNumber, Subject, Status, CreatedDate FROM Case WHERE ContactId = :u.ContactId ORDER BY CreatedDate DESC];
+        User u = [SELECT Id, AccountId FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
+        if (u.AccountId == null) {
+            throw new AuraHandledException('User has no Account linked');
+        }
+        List<Contact> contactsForAccount = [SELECT Id FROM Contact WHERE AccountId = :u.AccountId LIMIT 1];
+        if (contactsForAccount.isEmpty()) {
+            return new List<Case>();
+        }
+        Id contactId = contactsForAccount[0].Id;
+        List<Case> caseList =  [ SELECT Id, CaseNumber, Subject, Status, CreatedDate FROM Case WHERE ContactId = :contactId ORDER BY CreatedDate DESC];
         return caseList;
     }
     @AuraEnabled(cacheable=true)
     public static AssetRep getAssetRT() 
     {
         try {
-            User u = [SELECT Id, ContactId FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
-            if (u.ContactId == null) {
-                throw new AuraHandledException('User has no Contact linked');
+            User u = [SELECT Id, AccountId FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
+            if (u.AccountId == null) {
+                throw new AuraHandledException('User has no Account linked');
             }
-            Contact c = [ SELECT Id, AccountId FROM Contact WHERE Id = :u.ContactId LIMIT 1 ];
-
-            if (c.AccountId == null) {
-                throw new AuraHandledException('Contact has no Account linked');
+            List<Contact> contacts = [ SELECT Id, AccountId FROM Contact WHERE AccountId = :u.AccountId LIMIT 1 ];
+            if (contacts.isEmpty()) {
+                throw new AuraHandledException('No Contact found for user Account');
             }
+            Contact c = contacts[0];
             Map<String, Id> rtMap = new Map<String, Id>();
             for (RecordType rt : [SELECT Id, DeveloperName FROM RecordType WHERE SObjectType = 'Asset']) {
                 rtMap.put(rt.DeveloperName, rt.Id);
             }
-            List<Asset> al = [ SELECT Id, Name, Status, RecordTypeId, Product2.Name, PurchaseDate, InstallDate,Warranty_End__c, Service_Start_Date__c, Service_End_Date__c FROM Asset WHERE AccountId = :c.AccountId];
+            List<Asset> al = [ SELECT Id, Name, Status, RecordTypeId, Product2.Name, PurchaseDate, Service_Type__c, Warranty_End__c, Warranty_Status__c, Quantity, Service_Start_Date__c, Service_End_Date__c FROM Asset WHERE AccountId = :c.AccountId];
             return new AssetRep(al, rtMap);
         } 
         catch (Exception e) {
@@ -92,4 +100,39 @@ public without sharing class AssetController
         }
     }
 
+    @AuraEnabled
+    public static Asset updateServiceStatus(Id assetId, String newStatus) {
+        try {
+            if (assetId == null || String.isBlank(newStatus)) {
+                throw new AuraHandledException('Asset Id and newStatus are required');
+            }
+            Asset a = [SELECT Id, Status FROM Asset WHERE Id = :assetId LIMIT 1];
+            a.Status = newStatus;
+            update a;
+            return a;
+        } catch (Exception e) {
+            throw new AuraHandledException('ERROR updating status: ' + e.getMessage());
+        }
+    }
+
+    @AuraEnabled
+    public static Asset updateServiceStatusWithExtension(Id assetId, String newStatus, Integer monthsToAdd) {
+        try {
+            if (assetId == null || String.isBlank(newStatus) || monthsToAdd == null) {
+                throw new AuraHandledException('assetId, newStatus and monthsToAdd are required');
+            }
+            Asset a = [SELECT Id, Status, Service_End_Date__c, Service_Start_Date__c FROM Asset WHERE Id = :assetId LIMIT 1];
+            a.Status = newStatus;
+            a.Service_Start_Date__c = System.today();
+            if (a.Service_End_Date__c == null) {
+                a.Service_End_Date__c = System.today().addMonths(monthsToAdd);
+            } else {
+                a.Service_End_Date__c = a.Service_End_Date__c.addMonths(monthsToAdd);
+            }
+            update a;
+            return a;
+        } catch (Exception e) {
+            throw new AuraHandledException('ERROR updating status with extension: ' + e.getMessage());
+        }
+    }
 }

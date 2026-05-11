@@ -1,9 +1,15 @@
 import { LightningElement, wire, api } from 'lwc';
 import getAssetRT from '@salesforce/apex/AssetController.getAssetRT';
+import updateServiceStatus from '@salesforce/apex/AssetController.updateServiceStatus';
+import { refreshApex } from '@salesforce/apex';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-const ACTIONS = [
+const PRODUCT_ACTIONS = [
     { label: 'Open Case', name: 'open_case' },
     { label: 'Extend Warranty', name: 'extend_warranty' }
+];
+const SERVICE_ACTIONS = [
+    { label: 'Open Case', name: 'open_case' }
 ];
 export default class ExpsiteProduct extends LightningElement {
     @api type;
@@ -18,14 +24,14 @@ export default class ExpsiteProduct extends LightningElement {
     ];
 
     productColumns = [
-        { label: 'Name', fieldName: 'Name', type: 'text' },
+        { label: 'Asset Name', fieldName: 'Name', type: 'text' },
         { label: 'Quantity', fieldName: 'Quantity', type: 'number' },
         { label: 'Warranty Status', fieldName: 'Warranty_Status__c', type: 'text' },
-        { label: 'Product', fieldName: 'ProductName', type: 'text' },
+        { label: 'Product Name', fieldName: 'ProductName', type: 'text' },
         { label: 'Warranty End', fieldName: 'Warranty_End__c', type: 'date' },
         {
             type: 'action',
-            typeAttributes: { rowActions: ACTIONS, menuAlignment: 'right' }
+            typeAttributes: { rowActions: PRODUCT_ACTIONS, menuAlignment: 'right' }
         }
     ];
 
@@ -37,7 +43,7 @@ export default class ExpsiteProduct extends LightningElement {
         { label: 'Service Type', fieldName: 'Service_Type__c', type: 'text' },
         {
             type: 'action',
-            typeAttributes: { rowActions: ACTIONS, menuAlignment: 'right' }
+            typeAttributes: { rowActions: SERVICE_ACTIONS, menuAlignment: 'right' }
         }
     ];
 
@@ -45,8 +51,19 @@ export default class ExpsiteProduct extends LightningElement {
         return this.type === 'product' ? this.productColumns : this.serviceColumns;
     }
 
+    get isProduct() {
+        return this.type === 'product';
+    }
+
+    get isService() {
+        return this.type === 'service';
+    }
+
+    _wiredAssetsResult;
     @wire(getAssetRT)
-    wiredAssets({ data, error }) {
+    wiredAssets(result) {
+        this._wiredAssetsResult = result;
+        const { data, error } = result;
         if (data) {
             this.rawData = data;
             this.currentPage = 1;
@@ -99,6 +116,7 @@ export default class ExpsiteProduct extends LightningElement {
     get hasData() {
         return this.finalData && this.finalData.length > 0;
     }
+
     get totalPages() {
         return Math.max(1, Math.ceil((this.finalData ? this.finalData.length : 0) / this.pageSize));
     }
@@ -109,6 +127,129 @@ export default class ExpsiteProduct extends LightningElement {
         return this.finalData.slice(start, start + this.pageSize);
     }
 
+    get processedRows() {
+        if (!this.pagedData || !this.columns) {
+            return [];
+        }
+        return this.pagedData.map((r, rowIndex) => {
+            const cells = this.columns.map((col) => {
+                const field = col.fieldName || '';
+                let value = '';
+                if (field) {
+                    if (r[field] !== undefined && r[field] !== null) {
+                        value = r[field];
+                    } else {
+                        const parts = field.split('.');
+                        value = parts.reduce((acc, part) => {
+                            if (acc && acc[part] !== undefined && acc[part] !== null) {
+                                return acc[part];
+                            }
+                            return '';
+                        }, r);
+                    }
+                }
+                if (value === 0) {
+                    value = '0';
+                } else if (value === null || value === undefined) {
+                    value = '';
+                } else if (typeof value === 'object') {
+                    try {
+                        value = String(value);
+                    } catch (e) {
+                        value = '';
+                    }
+                } else {
+                    value = String(value);
+                }
+                return { key: field || String(Math.random()), value };
+            });
+            const rowKey = r.Id || rowIndex;
+            const actionsVisible = this.visibleActionRows ? this.visibleActionRows.has(String(rowKey)) : false;
+            const warrantyStatus = (r.Warranty_Status__c || '').toString();
+            const isWarrantyActive = warrantyStatus && warrantyStatus.toLowerCase() === 'active';
+            const hasWarrantyStatus = Boolean(r.Warranty_Status__c);
+            const serviceStatus = (r.Status || '').toString();
+            const isServiceActive = serviceStatus && serviceStatus.toLowerCase() === 'active';
+            const hasServiceStatus = Boolean(r.Status);
+
+            return {
+                original: r,
+                _cells: cells,
+                _rowKey: String(rowKey),
+                _actionsVisible: actionsVisible,
+                _isWarrantyActive: isWarrantyActive,
+                _hasWarrantyStatus: hasWarrantyStatus,
+                _isServiceActive: isServiceActive,
+                _hasServiceStatus: hasServiceStatus
+            };
+        });
+    }
+
+    visibleActionRows = new Set();
+
+    toggleRowActions(event) {
+        const rowKey = event.currentTarget.dataset.rowKey;
+        if (!rowKey) return;
+        if (this.visibleActionRows.has(rowKey)) {
+            this.visibleActionRows.delete(rowKey);
+        } else {
+            this.visibleActionRows.add(rowKey);
+        }
+        this.visibleActionRows = new Set(this.visibleActionRows);
+    }
+
+    isRowActionsVisible(rowKey) {
+        return this.visibleActionRows.has(rowKey);
+    }
+
+    handleOpenCaseClick(event) {
+        const assetId = event.currentTarget.dataset.id;
+        this.dispatchEvent(new CustomEvent('createcase', { detail: assetId }));
+        this.dispatchEvent(new CustomEvent('opencreatemodal', { detail: { assetId } }));
+        const rowKey = event.currentTarget.dataset.rowKey;
+        if (rowKey && this.visibleActionRows.has(rowKey)) {
+            this.visibleActionRows.delete(rowKey);
+            this.visibleActionRows = new Set(this.visibleActionRows);
+        }
+    }
+
+    handleExtendClick(event) {
+        const assetId = event.currentTarget.dataset.id;
+        this.dispatchEvent(new CustomEvent('openextendmodal', { detail: { assetId } }));
+        this.dispatchEvent(new CustomEvent('extend', { detail: assetId }));
+        const rowKey = event.currentTarget.dataset.rowKey;
+        if (rowKey && this.visibleActionRows.has(rowKey)) {
+            this.visibleActionRows.delete(rowKey);
+            this.visibleActionRows = new Set(this.visibleActionRows);
+        }
+    }
+
+    renewServiceClick(event) {
+        const assetId = event.currentTarget.dataset.id;
+        updateServiceStatusWithExtension({ assetId, newStatus: 'Active', monthsToAdd: 6 })
+            .then((updated) => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Service Renewed',
+                        message: 'Service status set to Active and end date extended by 6 months.',
+                        variant: 'success'
+                    })
+                );
+                if (this._wiredAssetsResult) {
+                    refreshApex(this._wiredAssetsResult);
+                }
+            })
+            .catch((err) => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error',
+                        message: 'Could not renew service: ' + (err.body ? err.body.message : err.message),
+                        variant: 'error'
+                    })
+                );
+            });
+    }
+
     get isFirstPage() {
         return this.currentPage <= 1;
     }
@@ -116,11 +257,13 @@ export default class ExpsiteProduct extends LightningElement {
     get isLastPage() {
         return this.currentPage >= this.totalPages;
     }
+
     handlePrev() {
         if (this.currentPage > 1) {
             this.currentPage -= 1;
         }
     }
+
     handleNext() {
         if (this.currentPage < this.totalPages) {
             this.currentPage += 1;
@@ -174,10 +317,12 @@ export default class ExpsiteProduct extends LightningElement {
             })
         );
     }
+
     extendService(event) {
         const assetId = event.currentTarget.dataset.id;
         console.log('Service ', assetId);
     }
+
     extendWarranty(event) {
         const assetId = event.currentTarget.dataset.id;
         this.dispatchEvent(new CustomEvent('extend', {
