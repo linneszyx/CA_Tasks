@@ -1,0 +1,16 @@
+<template>
+    <template if:true={contacts.length}>
+        <div class="slds-box slds-theme_default slds-m-top_medium">
+            <div class="slds-text-heading_small slds-m-bottom_medium">
+                Selected Contacts ({contacts.length})
+            </div>
+            <div class="slds-grid slds-wrap">
+                <template for:each={contacts} for:item="con">
+                    <div key={con.Id} class="slds-m-right_small slds-m-bottom_small">
+                        <lightning-pill label={con.Name} name={con.Id} onremove={handleRemove}></lightning-pill>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+</template> 

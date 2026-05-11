@@ -1,0 +1,58 @@
+<template>
+    <template if:true={isOpen}>
+        <section class="group-modal">
+            <div class="group-header">
+                <div class="group-title">
+                    Related Cases And Tasks
+                </div>
+                <lightning-button-icon icon-name="utility:close" alternative-text="Close"
+                    onclick={handleClick}></lightning-button-icon>
+            </div>
+            <div class="group-body">
+                <lightning-accordion allow-multiple-sections-open>
+                    <template for:each={groupData} for:item="con">
+                        <lightning-accordion-section active-section-name={activeSections} key={con.contactId}
+                            name={con.contactId} label={con.contactLabel}>
+                            <div class="group-section">
+                                <div class="group-card">
+
+                                    <div class="section-title">
+
+                                        Related Cases ({con.cases.length})
+
+                                    </div>
+                                    <template if:true={con.cases.length}>
+
+                                        <lightning-datatable key-field="Id" data={con.cases} columns={caseColumns}
+                                            hide-checkbox-column>
+                                        </lightning-datatable>
+                                    </template>
+                                    <template if:false={con.cases.length}>
+                                        <div class="empty-state">
+                                            No Related Cases
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="group-card slds-m-top_large">
+                                    <div class="section-title">
+                                        Related Tasks ({con.tasks.length})
+                                    </div>
+                                    <template if:true={con.tasks.length}>
+                                        <lightning-datatable key-field="Id" data={con.tasks} columns={taskColumns}
+                                            hide-checkbox-column>
+                                        </lightning-datatable>
+                                    </template>
+                                    <template if:false={con.tasks.length}>
+                                        <div class="empty-state">
+                                            No Related Tasks
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </lightning-accordion-section>
+                    </template>
+                </lightning-accordion>
+            </div>
+        </section>
+    </template>
+</template>

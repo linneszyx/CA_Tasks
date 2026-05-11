@@ -1,0 +1,26 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    <template if:true={cases.length}>
+
+        <lightning-accordion allow-multiple-sections-open class="slds-m-top_medium">
+            <lightning-accordion-section name="cases" label={sectionLabel}>
+                <lightning-datatable key-field="Id" data={cases} columns={columns}
+                    hide-checkbox-column></lightning-datatable>
+                <template if:true={showFullScreenButton}>
+                    <div class="slds-m-top_medium slds-text-align_right">
+                        <lightning-button label="View Full Screen" variant="brand" onclick={handleFullScreen}>
+                        </lightning-button>
+
+                    </div>
+                </template>
+            </lightning-accordion-section>
+        </lightning-accordion>
+    </template>
+    <template if:false={cases.length}>
+        <div class="slds-box slds-theme_default slds-m-top_medium">
+            No Related Cases Found
+        </div>
+    </template>
+</template>

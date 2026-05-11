@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "Salesforce DX": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@salesforce/mcp@latest",
+        "--orgs",
+        "DEFAULT_TARGET_ORG,mydevorg2,suryansh.upadhyay.cbf05277412e@agentforce.com",
+        "--toolsets",
+        "all"
+      ]
+    }
+  }
+}

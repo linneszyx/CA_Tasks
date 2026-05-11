@@ -1,0 +1,22 @@
+<template>
+    <lightning-card>
+        <div class="slds-p-around_medium">
+            <div class="slds-box slds-theme_default">
+                <c-mg-contact-search selected-contact={selectedContact}
+                    onselectionchange={handleSelectionChange}></c-mg-contact-search>
+                <c-mg-select-contact-summary contacts={selectedContact}
+                    onremovecontact={handleRemoveContact}></c-mg-select-contact-summary>
+                <template if:true={groupButton}>
+                    <div class="slds-m-top_medium slds-text-align_right">
+                        <lightning-button label="Full Screen" variant="brand" onclick={openGroup}></lightning-button>
+                    </div>
+                </template>
+                <c-mg-cases-accordion cases={cases} is-loading={isCaseLoading}
+                    onfullscreen={handleFullScreen}></c-mg-cases-accordion>
+                <c-mg-tasks-accordion tasks={tasks} is-loading={isTaskLoading}></c-mg-tasks-accordion>
+                <c-mg-full-screen-modal is-open={isGroupOpen} group-data={groupData}
+                    onclose={closeGroup}></c-mg-full-screen-modal>
+            </div>
+        </div>
+    </lightning-card>
+</template>

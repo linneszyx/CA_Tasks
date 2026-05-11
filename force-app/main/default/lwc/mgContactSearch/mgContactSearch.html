@@ -1,0 +1,24 @@
+<template>
+    <div class="slds-box slds-theme_default">
+        <div class="slds-text-heading_small slds-m-bottom_small">Search Contacts</div>
+        <lightning-input type="Search" label="Search Name or Phone" placeholder="Enter Name or Phone..."
+            onchange={handleSearch}></lightning-input>
+        <template if:true={contacts.length}>
+            <div class="slds-m-top_medium search-results">
+                <template for:each={contacts} for:item="con">
+                    <div key={con.Id} class="slds-p-around_small slds-border_bottom">
+                        <lightning-input type="checkbox" checked={con.checked} label={con.Name} data-id={con.Id}
+                            data-name={con.Name} onchange={handleSelection}></lightning-input>
+                        <template if:true={isLoading}>
+                            <div class="slds-m-top_small">
+                                <lightning-spinner alternative-text="Searching Contacts"
+                                    size="small"></lightning-spinner>
+                            </div>
+                        </template>
+                    </div>
+
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

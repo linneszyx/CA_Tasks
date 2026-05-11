@@ -1,0 +1,18 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    <template if:true={tasks.length}>
+        <lightning-accordion allow-multiple-sections-open class="slds-m-top_medium">
+            <lightning-accordion-section name="tasks" label={sectionLabel}>
+                <lightning-datatable key-field="Id" data={tasks} columns={columns}
+                    hide-checkbox-column></lightning-datatable>
+            </lightning-accordion-section>
+        </lightning-accordion>
+    </template>
+    <template if:false={tasks.length}>
+        <div class="slds-box slds-theme_default slds-m-top_medium">
+            No Related Tasks Found
+        </div>
+    </template>
+</template>
