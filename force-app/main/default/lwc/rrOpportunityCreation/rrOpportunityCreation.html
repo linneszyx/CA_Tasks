@@ -1,0 +1,7 @@
+<template>
+    <lightning-card title="Opportunity">
+        <lightning-input label="Opportunity Name" onchange={handleName}></lightning-input>
+        <lightning-combobox label="Country" options={countryOptions} onchange={handleCountry}></lightning-combobox>
+        <lightning-button label="Next" onclick={saveOpportunity}></lightning-button>
+    </lightning-card>
+</template>

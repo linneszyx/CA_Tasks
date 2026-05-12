@@ -1,0 +1,18 @@
+<template>
+    <lightning-card title="Product Selection">
+        <template if:true={isLocked}>
+            <div class="slds-text-color_error slds-p-around_medium">
+                Opportunity is locked for approval.
+            </div>
+        </template>
+        <div class="slds-p-around_medium">
+            <lightning-datatable key-field="Id" data={products} columns={columns} draft-values={draftValues}
+                onsave={handleSave} hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+        <div class="slds-p-around_medium">
+            <lightning-button variant="brand" label="Next" onclick={handleNext} disabled={isLocked}>
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>

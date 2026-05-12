@@ -39,7 +39,6 @@ export default class MyMainDashboard extends LightningElement {
                 tasks: relatedTasks,
                 caseTitle: `Related Cases`,
                 taskTitle: `Related Tasks`,
-
             }
         })
     }

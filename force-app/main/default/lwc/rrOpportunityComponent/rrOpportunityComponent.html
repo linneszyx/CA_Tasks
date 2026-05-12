@@ -1,0 +1,10 @@
+<template>
+    <template if:true={isPage1}>
+        <c-rr-opportunity-creation onnext={handleNext}></c-rr-opportunity-creation>
+    </template>
+    <template if:true={isPage2}>
+        <c-rr-production-section onnext={handleNext}></c-rr-production-section>
+    </template>
+    <template if:true={isPage3}></template>
+    <template if:true={isPage4}></template>
+</template>
